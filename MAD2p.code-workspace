@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"name": "MAD2p",
+			"path": "."
+		},
+		{
+			"name": "bootcamp_v1",
+			"path": "../bootcamp_v1"
+		},
+		{
+			"name": "utsav_mad2",
+			"path": "../utsav_mad2"
+		},
+		{
+			"name": "MAD1p",
+			"path": "../MAD1p"
+		}
+	]
+}
