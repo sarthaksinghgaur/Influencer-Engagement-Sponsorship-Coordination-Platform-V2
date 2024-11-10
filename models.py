@@ -35,7 +35,6 @@ class User(db.Model, UserMixin):
     active = Column(Boolean())
     fs_uniquifier = Column(String(64), unique=True, nullable=False)
     confirmed_at = Column(DateTime())
-    is_approved = Column(Boolean, default=False)
     roles = relationship('Role', secondary='roles_users',
                          backref=backref('users', lazy='dynamic'))
     
@@ -136,7 +135,6 @@ class Influencer(db.Model):
         db.session.commit()
     
 
-
 class Sponsor(db.Model):
     __tablename__ = 'sponsor'
     id = db.Column(db.Integer, primary_key=True)
@@ -144,6 +142,7 @@ class Sponsor(db.Model):
     industry = db.Column(db.String(120), nullable=False)
     budget = db.Column(db.Integer, nullable=False)
     flagged = db.Column(db.Boolean, default=False)
+    is_approved = Column(Boolean, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
@@ -153,7 +152,7 @@ class Sponsor(db.Model):
 
     def __repr__(self):
         return f'<Sponsor {self.id} - {self.company_name}>'
-    
+
     def serialize(self):
         return {
             'id': self.id,
@@ -199,8 +198,6 @@ class Sponsor(db.Model):
             'flagged': False
         })
         db.session.commit()
-
-    
 
 
 class Campaign(db.Model):

@@ -1,29 +1,34 @@
-from flask import jsonify, session, request
+from flask import jsonify, make_response, request
 from flask_restful import Resource
 from flask_security import auth_token_required, roles_accepted
 from models import *
+from flask_login import current_user
 
 class SponsorDashboard(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
     def get(self):
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'sponsor':
-            return jsonify({'message': 'You do not have permission to access the sponsor dashboard.'}), 403
-
+        user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+
         if not sponsor:
-            return jsonify({'message': 'Please complete your sponsor registration.'}), 400
+            return jsonify({'message': 'Please complete your sponsor registration.'})
+        
+        if not sponsor.is_approved:
+            return make_response(jsonify({"message": "Your account is pending approval."}), 403)
+        
+        if sponsor.flagged:
+            return make_response(jsonify({"message": "Your account has been flagged."}), 403)
 
         campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
         ad_requests = AdRequest.query.filter_by(sponsor_id=sponsor.id).all()
 
-        return jsonify({
-            'user': {'id': user.id, 'username': user.username, 'role': user.role},
+        response_data = {
             'sponsor': {'id': sponsor.id, 'company_name': sponsor.company_name},
             'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
             'ad_requests': [{'id': ad_request.id, 'status': ad_request.status} for ad_request in ad_requests]
-        })
+        }
+        return make_response(jsonify(response_data), 200)
     
 class CreateCampaign(Resource):
     @auth_token_required
@@ -34,17 +39,15 @@ class CreateCampaign(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
     def post(self):
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'sponsor':
-            return jsonify({'message': 'You do not have permission to create a campaign.'}), 403
-
-        name = request.form['name']
-        description = request.form['description']
-        start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d')
-        end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d')
-        budget = request.form['budget']
-        visibility = request.form['visibility']
-        goals = request.form['goals']
+        data = request.get_json()
+        user = current_user
+        name = data.get('name')
+        description = data.get('description')
+        start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+        end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d')
+        budget = data.get('budget')
+        visibility = data.get('visibility')
+        goals = data.get('goals')
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
         sponsor_id = sponsor.id
 
@@ -83,13 +86,14 @@ class EditCampaign(Resource):
     @roles_accepted('sponsor')
     def post(self, campaign_id):
         campaign = Campaign.query.get_or_404(campaign_id)
-        campaign.name = request.form['name']
-        campaign.description = request.form['description']
-        campaign.start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d')
-        campaign.end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d')
-        campaign.budget = request.form['budget']
-        campaign.visibility = request.form['visibility']
-        campaign.goals = request.form['goals']
+        data = request.get_json()
+        campaign.name = data.get('name')
+        campaign.description = data.get('description')
+        campaign.start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+        campaign.end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d')
+        campaign.budget = data.get('budget')
+        campaign.visibility = data.get('visibility')
+        campaign.goals = data.get('goals')
 
         db.session.commit()
         return jsonify({'message': 'Campaign updated successfully!'})
@@ -99,10 +103,7 @@ class DeleteCampaign(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
     def delete(self, campaign_id):
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'sponsor':
-            return jsonify({'message': 'You do not have permission to delete this campaign.'}), 403
-
+        user = current_user
         campaign = Campaign.query.get_or_404(campaign_id)
         ad_requests = AdRequest.query.filter_by(campaign_id=campaign_id).all()
         for ad_request in ad_requests:
@@ -117,31 +118,27 @@ class CreateAdRequest(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
     def get(self):
-        user = User.query.get(session['user_id'])
+        user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
         campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
-        influencers = Influencer.query.all()
         return jsonify({
-            'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
-            'influencers': [{'id': influencer.id, 'name': influencer.name} for influencer in influencers]
+            'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns]
         })
 
     @auth_token_required
     @roles_accepted('sponsor')
     def post(self):
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'sponsor':
-            return jsonify({'message': 'You do not have permission to create an ad request.'}), 403
-
-        name = request.form['name']
+        user = current_user
+        data = request.get_json()
+        name = data.get('name')
+        requirements = data.get('requirements')
+        payment_amount = data.get('payment_amount')
+        messages = data.get('messages')
+        status = "Available"
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
         sponsor_id = sponsor.id
-        campaign_id = request.form['campaign_id']
-        messages = request.form['messages']
-        requirements = request.form['requirements']
-        payment_amount = request.form['payment_amount']
-        status = "Available"
-
+        campaign_id = data.get('campaign_id')
+        
         new_ad_request = AdRequest(
             name=name,
             messages=messages,
@@ -161,7 +158,7 @@ class EditAdRequest(Resource):
     def get(self, ad_request_id):
         ad_request = AdRequest.query.get_or_404(ad_request_id)
         campaigns = Campaign.query.all()
-        influencers = User.query.filter_by(role='influencer').all()
+        influencers = Influencer.query.all()
         ad_request_data = {
             'id': ad_request.id,
             'name': ad_request.name,
@@ -170,7 +167,7 @@ class EditAdRequest(Resource):
             'payment_amount': ad_request.payment_amount,
             'status': ad_request.status,
             'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
-            'influencers': [{'id': influencer.id, 'name': influencer.username} for influencer in influencers]
+            'influencers': [{'id': influencer.id, 'name': influencer.name} for influencer in influencers]
         }
         return jsonify(ad_request_data)
 
@@ -178,11 +175,13 @@ class EditAdRequest(Resource):
     @roles_accepted('sponsor')
     def post(self, ad_request_id):
         ad_request = AdRequest.query.get_or_404(ad_request_id)
-        ad_request.name = request.form['name']
-        ad_request.messages = request.form['messages']
-        ad_request.requirements = request.form['requirements']
-        ad_request.payment_amount = request.form['payment_amount']
-        ad_request.status = request.form['status']
+        data = request.get_json()
+        
+        ad_request.name = data['name']
+        ad_request.messages = data['messages']
+        ad_request.requirements = data['requirements']
+        ad_request.payment_amount = data['payment_amount']
+        ad_request.status = data['status']
         
         db.session.commit()
         return jsonify({'message': 'Ad request updated successfully!'})
@@ -195,4 +194,73 @@ class DeleteAdRequest(Resource):
         db.session.delete(ad_request)
         db.session.commit()
         return jsonify({'message': 'Ad request deleted successfully!'})
+    
+
+
+class FindInfluencers(Resource):
+    @auth_token_required
+    @roles_accepted('sponsor')
+    def get(self):
+        return jsonify({'message': 'Render the influencer search form here.'})
+
+    @auth_token_required
+    @roles_accepted('sponsor')
+    def post(self):
+        data = request.get_json()
+        name = data.get('name')
+        category = data.get('category')
+        niche = data.get('niche')
+        reach = data.get('reach')
+
+        query = Influencer.query
+        if name:
+            query = query.filter(Influencer.name.ilike(f'%{name}%'))
+        if category:
+            query = query.filter(Influencer.category.ilike(f'%{category}%'))
+        if niche:
+            query = query.filter(Influencer.niche.ilike(f'%{niche}%'))
+        if reach:
+            query = query.filter(Influencer.reach >= reach)
+
+        influencers = query.all()
+        influencer_data = [{'id': influencer.id, 'name': influencer.name, 'category': influencer.category, 'niche': influencer.niche, 'reach': influencer.reach} for influencer in influencers]
+
+        return jsonify(influencer_data)
+
+class ActionInfluencer(Resource):
+    @auth_token_required
+    @roles_accepted('sponsor')
+    def get(self, influencer_id):
+        influencer = Influencer.query.get_or_404(influencer_id)
+        user = current_user
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
+        ad_requests = AdRequest.query.filter_by(sponsor_id=sponsor.id).all()
+        return jsonify({
+            'influencer': {'id': influencer.id, 'name': influencer.name},
+            'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
+            'ad_requests': [{'id': ad_request.id, 'name': ad_request.name} for ad_request in ad_requests]
+        })
+
+    @auth_token_required
+    @roles_accepted('sponsor')
+    def post(self, influencer_id):
+        data = request.get_json()
+        ad_request_id = data['selected_ad_request_id']
+        action = data['action']
+        
+        ad_request = AdRequest.query.get_or_404(ad_request_id)
+        ad_request.influencer_id = influencer_id
+        
+        if action == 'accept':
+            ad_request.status = 'Accepted'
+        elif action == 'reject':
+            ad_request.status = 'Rejected'
+        elif action == 'negotiate':
+            new_payment_amount = data['new_payment_amount']
+            ad_request.payment_amount = new_payment_amount
+            ad_request.status = 'Negotiations Underway from sponsor'
+        
+        db.session.commit()
+        return jsonify({'message': 'Action taken successfully!'})
     

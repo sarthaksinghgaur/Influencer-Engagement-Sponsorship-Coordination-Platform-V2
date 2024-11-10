@@ -1,26 +1,26 @@
-from flask import jsonify, session, request
+from flask import jsonify, session, request, make_response
 from flask_restful import Resource
 from flask_security import auth_token_required, roles_accepted
 from models import *
+from flask_login import current_user
 
 class InfluencerDashboard(Resource):
     @auth_token_required
     @roles_accepted('influencer')
     def get(self):
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'influencer':
-            return jsonify({'message': 'You do not have permission to access the influencer dashboard.'}), 403
-
+        user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
         if not influencer:
             return jsonify({'message': 'Please complete your influencer registration.'}), 400
+        
+        if influencer.flagged:
+            return make_response(jsonify({"message": "Your account has been flagged."}), 403)
 
         ad_requests = AdRequest.query.filter_by(influencer_id=influencer.id).all()
         campaign_ids = {ad_request.campaign_id for ad_request in ad_requests}
         campaigns = Campaign.query.filter(Campaign.id.in_(campaign_ids)).all()
 
         return jsonify({
-            'user': {'id': user.id, 'username': user.username, 'role': user.role},
             'influencer': {'id': influencer.id, 'name': influencer.name},
             'ad_requests': [{'id': ad_request.id, 'status': ad_request.status} for ad_request in ad_requests],
             'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns]
@@ -45,19 +45,23 @@ class ActionAdRequest(Resource):
     @roles_accepted('influencer')
     def post(self, id):
         ad_request = AdRequest.query.get_or_404(id)
-        action = request.form['action']
+        data = request.get_json()
+        action = data['action']
+        
         if action == 'accept':
             ad_request.status = 'Accepted'
         elif action == 'reject':
             ad_request.status = 'Rejected'
         elif action == 'negotiate':
-            new_payment_amount = request.form['new_payment_amount']
+            new_payment_amount = data['new_payment_amount']
             ad_request.payment_amount = new_payment_amount
             ad_request.status = 'Negotiations Underway from influencer'
         
-        influencer = Influencer.query.filter_by(user_id=session['user_id']).first()
+        user = current_user
+        influencer = Influencer.query.filter_by(user_id=user.id).first()
         ad_request.influencer_id = influencer.id
         db.session.commit()
+        
         return jsonify({'message': 'Action taken successfully!'})
     
 class FindCampaigns(Resource):
@@ -69,12 +73,13 @@ class FindCampaigns(Resource):
     @auth_token_required
     @roles_accepted('influencer')
     def post(self):
-        name = request.form.get('name')
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
-        budget = request.form.get('budget')
+        data = request.get_json()
+        name = data.get('name')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        budget = data.get('budget')
 
-        query = Campaign.query.filter_by(visibility='public')
+        query = Campaign.query.filter_by(visibility='public', flagged=False)
         
         if name:
             query = query.filter(Campaign.name.ilike(f'%{name}%'))
@@ -103,40 +108,11 @@ class FindAdRequests(Resource):
             'ad_requests': ad_request_data
         })
 
-class FindInfluencers(Resource):
-    @auth_token_required
-    @roles_accepted('sponsor')
-    def get(self):
-        return jsonify({'message': 'Render the influencer search form here.'})
-
-    @auth_token_required
-    @roles_accepted('sponsor')
-    def post(self):
-        name = request.form.get('name')
-        category = request.form.get('category')
-        niche = request.form.get('niche')
-        reach = request.form.get('reach')
-
-        query = Influencer.query
-        if name:
-            query = query.filter(Influencer.name.ilike(f'%{name}%'))
-        if category:
-            query = query.filter(Influencer.category.ilike(f'%{category}%'))
-        if niche:
-            query = query.filter(Influencer.niche.ilike(f'%{niche}%'))
-        if reach:
-            query = query.filter(Influencer.reach >= reach)
-
-        influencers = query.all()
-        influencer_data = [{'id': influencer.id, 'name': influencer.name, 'category': influencer.category, 'niche': influencer.niche, 'reach': influencer.reach} for influencer in influencers]
-
-        return jsonify(influencer_data)
-    
 class UpdateInfluencerProfile(Resource):
     @auth_token_required
     @roles_accepted('influencer')
     def get(self):
-        user = User.query.get(session['user_id'])
+        user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
         influencer_data = {
             'name': influencer.name,
@@ -150,39 +126,16 @@ class UpdateInfluencerProfile(Resource):
     @auth_token_required
     @roles_accepted('influencer')
     def post(self):
-        user = User.query.get(session['user_id'])
+        user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
-        influencer.name = request.form['name']
-        influencer.category = request.form['category']
-        influencer.niche = request.form['niche']
-        influencer.reach = request.form['reach']
-        influencer.platform = request.form['platform']
+        data = request.get_json()
+        
+        influencer.name = data['name']
+        influencer.category = data['category']
+        influencer.niche = data['niche']
+        influencer.reach = data['reach']
+        influencer.platform = data['platform']
+        
         db.session.commit()
         return jsonify({'message': 'Profile updated successfully!'})
-    
-class ActionInfluencer(Resource):
-    @auth_token_required
-    @roles_accepted('sponsor')
-    def get(self, influencer_id):
-        influencer = Influencer.query.get_or_404(influencer_id)
-        user = User.query.get(session['user_id'])
-        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-        campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
-        ad_requests = AdRequest.query.filter_by(sponsor_id=sponsor.id).all()
-        return jsonify({
-            'influencer': {'id': influencer.id, 'name': influencer.name},
-            'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
-            'ad_requests': [{'id': ad_request.id, 'name': ad_request.name} for ad_request in ad_requests]
-        })
 
-    @auth_token_required
-    @roles_accepted('sponsor')
-    def post(self, influencer_id):
-        ad_request_id = request.form['selected_ad_request_id']
-        action = request.form['action']
-        
-        ad_request = AdRequest.query.get_or_404(ad_request_id)
-        ad_request.influencer_id = influencer_id
-        ad_request.status = action
-        db.session.commit()
-        return jsonify({'message': 'Influencer requested for ad request successfully!'})
