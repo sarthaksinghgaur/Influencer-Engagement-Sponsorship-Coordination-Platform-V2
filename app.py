@@ -17,6 +17,10 @@ def create_app():
 
     from flask_cors import CORS
     CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})
+
+    from cacher import cache
+    cache.init_app(app)
 
     return app, api
 
