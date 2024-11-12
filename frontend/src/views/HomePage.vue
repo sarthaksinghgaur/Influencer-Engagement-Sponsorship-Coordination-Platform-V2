@@ -1,21 +1,42 @@
 <template>
-  <div class="library-home">
-    <header>
-      <h1>Influencer Engagement & Sponsorship Coordination Platform - V2</h1>
-      <h2>IITM MAD2 PROJECT</h2>
-      <p>Muhuhahahaha</p>
-    </header>
-    <!-- <div class="actions">
-      <button class="button">Sign Up</button>
-      <button class="button">Sign In</button>
-    </div> -->
+  <div class="container mt-5">
+    <div class="text-center">
+      <h1 class="display-4">Influencer Engagement & Sponsorship Coordination Platform - V2</h1>
+      <h2 class="text-muted">IITM MAD2 PROJECT</h2>
+      <p class="lead">Muhuhahahaha</p>
+    </div>
+
+    <!-- Flash messages section -->
+    <div v-if="messages.length" class="alert alert-info mt-4">
+      <ul class="list-unstyled">
+        <li v-for="(message, index) in messages" :key="index">
+          {{ message }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="button-container mt-4 d-flex justify-content-center">
+      <router-link :to="{ name: 'LoginPage' }">
+        <button class="btn btn-primary mx-2">Login</button>
+      </router-link>
+      <router-link :to="{ name: 'SignupPage' }">
+        <button class="btn btn-success mx-2">Sign Up</button>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  methods: {
-    
+  data() {
+    return {
+      messages: []
+    };
+  },
+  created() {
+    if (this.$route.query.message) {
+      this.messages.push(this.$route.query.message);
+    }
   }
-}
+};
 </script>

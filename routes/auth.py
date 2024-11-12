@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import  jsonify, make_response, request, session
-from flask_security import login_user, verify_password
+from flask_security import login_user, verify_password, logout_user
 from flask_security.utils import hash_password
 from flask_security import auth_token_required, roles_accepted
 from models import db, user_datastore, Sponsor, Influencer
@@ -24,7 +24,34 @@ class Login(Resource):
                 if token:
                     login_user(user)
                     db.session.commit()
-                return make_response(jsonify({"message": "login successful", "authToken": token, "username": user.username, "role": user.roles[0].name, "id": user.id}), 200)
+
+                    if user.roles[0].name=='admin': 
+                        is_complete = True
+                    
+                    elif user.roles[0].name=='influencer':
+                    
+                        influencer = Influencer.query.filter_by(user_id=user.id).first()
+                        if influencer:
+                            is_complete = True
+                            if influencer.flagged:
+                                return make_response(jsonify({"message": "Your account has been flagged."}), 403)
+                        else:
+                            is_complete = False                        
+                        
+                    elif user.roles[0].name=='sponsor':
+                        
+                        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+                        if sponsor:
+                            is_complete = True
+                            if sponsor.flagged:
+                                return make_response(jsonify({"message": "Your account has been flagged."}), 403) 
+                            if not sponsor.is_approved:
+                                return make_response(jsonify({"message": "Your account is pending approval."}), 403)
+                        else:
+                            is_complete = False  
+
+                    return make_response(jsonify({"message": "login successful", "authToken": token, "username": user.username, "role": user.roles[0].name, "id": user.id, "is_complete": is_complete}), 200)
+                    
             else:
                 return make_response(jsonify({"message": "invalid password"}), 401)        
         return make_response(jsonify({"message": "user not found", "username": username}), 404)
@@ -32,9 +59,12 @@ class Login(Resource):
 
 class Logout(Resource):
     def get(self):
-        session.clear()
-        return make_response(jsonify({'message': 'You have been logged out successfully.'}), 200)
-    
+        if current_user.is_authenticated:
+            logout_user()
+            session.clear()
+            return make_response(jsonify({'message': 'You have been logged out successfully.'}), 200)
+        else:
+            return make_response(jsonify({'message': 'No active session found, but you have been logged out.'}), 200)   
 
 
 class Signup(Resource):
@@ -62,17 +92,30 @@ class Signup(Resource):
             influencer = user_datastore.create_user(email=email, password=hashed_password, username=username)
             user_datastore.add_role_to_user(influencer, "influencer")
             db.session.commit()
-            return make_response(jsonify({"message": "user created", "id": influencer.id, "email": influencer.email}), 201)
+
+            user = user_datastore.find_user(username=username)
+            token = user.get_auth_token()
+            login_user(user)
+            db.session.commit()
+
+            return make_response(jsonify({"message": "user created", "id": influencer.id, "email": influencer.email, "authToken": token}), 201)
 
         elif role == 'sponsor':
             sponsor = user_datastore.create_user(email=email, password=hashed_password, username=username)
             user_datastore.add_role_to_user(sponsor, "sponsor")
             db.session.commit()
-            return make_response(jsonify({"message": "user created", "id": sponsor.id, "email": sponsor.email}), 201)
+
+            user = user_datastore.find_user(username=username)
+            token = user.get_auth_token()
+            login_user(user)
+            db.session.commit()
+
+            return make_response(jsonify({"message": "user created", "id": sponsor.id, "email": sponsor.email, "authToken": token}), 201)
         
         else:
             return make_response(jsonify({"message": "Invalid role specified"}), 400)
-    
+
+
 class SponsorRegistration(Resource):
     @auth_token_required
     @roles_accepted('sponsor')

@@ -82,36 +82,105 @@ class AdminViewUsers(Resource):
         users_data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
         return jsonify(users_data)
 
+class ToggleUserActive(Resource):
+    @auth_token_required
+    @roles_required('admin')
+    def post(self, user_id):
+        data = request.get_json()
+        if not data or 'active' not in data:
+            return make_response(jsonify({"message": "Invalid request. 'active' field is required."}), 400)
+
+        active_status = data['active']
+        
+        user = User.query.get(user_id)
+        if not user:
+            return make_response(jsonify({"message": "User not found."}), 404)
+
+        user.active = active_status
+        db.session.commit()
+
+        status_text = "activated" if user.active else "deactivated"
+        return make_response(jsonify({"message": f"User has been {status_text} successfully.", "user_id": user.id, "active": user.active}), 200)
+
+
+
 class AdminViewCampaigns(Resource):
     @auth_token_required
     @roles_accepted('admin')
     def get(self):
         campaigns = Campaign.query.all()
-        campaigns_data = [{'id': campaign.id, 'name': campaign.name, 'visibility': campaign.visibility} for campaign in campaigns]
+        campaigns_data = [
+            {
+                'id': campaign.id,
+                'name': campaign.name,
+                'description': campaign.description,
+                'start_date': campaign.start_date,
+                'end_date': campaign.end_date,
+                'budget': campaign.budget,
+                'visibility': campaign.visibility,
+                'goals': campaign.goals,
+                'flagged': campaign.flagged
+            } 
+            for campaign in campaigns
+        ]
         return jsonify(campaigns_data)
+
 
 class AdminViewAdRequests(Resource):
     @auth_token_required
     @roles_accepted('admin')
     def get(self):
         ad_requests = AdRequest.query.all()
-        ad_requests_data = [{'id': ad_request.id, 'status': ad_request.status, 'campaign_id': ad_request.campaign_id} for ad_request in ad_requests]
+        ad_requests_data = [
+            {
+                'id': ad_request.id,
+                'name': ad_request.name,
+                'messages': ad_request.messages,
+                'requirements': ad_request.requirements,
+                'payment_amount': ad_request.payment_amount,
+                'status': ad_request.status,
+                'flagged': ad_request.flagged
+            } 
+            for ad_request in ad_requests
+        ]
         return jsonify(ad_requests_data)
+
     
 class AdminViewSponsors(Resource):
     @auth_token_required
     @roles_accepted('admin')
     def get(self):
         sponsors = Sponsor.query.all()
-        sponsors_data = [{'id': sponsor.id, 'company_name': sponsor.company_name, 'flagged': sponsor.flagged} for sponsor in sponsors]
+        sponsors_data = [
+            {
+                'id': sponsor.id,
+                'company_name': sponsor.company_name,
+                'industry': sponsor.industry,
+                'budget': sponsor.budget,
+                'flagged': sponsor.flagged
+            } 
+            for sponsor in sponsors
+        ]
         return jsonify(sponsors_data)
+
     
 class AdminViewInfluencers(Resource):
     @auth_token_required
     @roles_accepted('admin')
     def get(self):
         influencers = Influencer.query.all()
-        influencers_data = [{'id': influencer.id, 'name': influencer.name, 'flagged': influencer.flagged} for influencer in influencers]
+        influencers_data = [
+            {
+                'id': influencer.id,
+                'name': influencer.name,
+                'category': influencer.category,
+                'niche': influencer.niche,
+                'reach': influencer.reach,
+                'platform': influencer.platform,
+                'flagged': influencer.flagged
+            } 
+            for influencer in influencers
+        ]
         return jsonify(influencers_data)
     
 class FlagCampaign(Resource):
@@ -158,5 +227,21 @@ class FlagInfluencer(Resource):
         
         status = "flagged" if influencer.flagged else "unflagged"
         return jsonify({"message": f"Influencer has been {status}.", "influencer_id": influencer.id, "flagged": influencer.flagged})
+    
+
+class FlagAdRequest(Resource):
+    @auth_token_required
+    @roles_required('admin')
+    def post(self, ad_request_id):
+        ad_request = AdRequest.query.get(ad_request_id)
+        if not ad_request:
+            return jsonify({"message": "Ad request not found"}), 404
+
+        ad_request.flagged = not ad_request.flagged
+        db.session.commit()
+
+        status = "flagged" if ad_request.flagged else "unflagged"
+        return jsonify({"message": f"Ad request has been {status}.", "ad_request_id": ad_request.id, "flagged": ad_request.flagged})
+
 
     

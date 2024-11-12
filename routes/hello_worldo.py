@@ -38,7 +38,7 @@ class hello_worldo(Resource):
     def options(self):
         user = current_user
         print(user.id)
-        sponsor = Sponsor.query.filter(Sponsor.id == user.id).all()
-        print(sponsor)
+        # sponsor = Sponsor.query.filter(Sponsor.id == user.id).all()
+        # print(sponsor)
         return jsonify({"message": "options working"})
     

@@ -281,7 +281,8 @@ class AdRequest(db.Model):
     messages = db.Column(db.Text, nullable=True)
     requirements = db.Column(db.Text, nullable=False)
     payment_amount = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(10), nullable=False) 
+    status = db.Column(db.String(10), nullable=False)
+    flagged = db.Column(db.Boolean, default=False) 
 
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
