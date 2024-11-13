@@ -1,10 +1,8 @@
 from flask_security import UserMixin, RoleMixin, AsaList, SQLAlchemyUserDatastore
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy import Boolean, DateTime, Column, Integer, \
-                    String, ForeignKey
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -35,8 +33,7 @@ class User(db.Model, UserMixin):
     active = Column(Boolean())
     fs_uniquifier = Column(String(64), unique=True, nullable=False)
     confirmed_at = Column(DateTime())
-    roles = relationship('Role', secondary='roles_users',
-                         backref=backref('users', lazy='dynamic'))
+    roles = relationship('Role', secondary='roles_users', backref=backref('users', lazy='dynamic'))
     
     influencer = db.relationship('Influencer', uselist=False, back_populates='user', cascade="all, delete-orphan")
     sponsor = db.relationship('Sponsor', uselist=False, back_populates='user', cascade="all, delete-orphan")

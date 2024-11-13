@@ -98,6 +98,15 @@ button:hover {
   background-color: #e55d50;  
 }
 
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
  
 .statistics {
   background-color: #ffffff; 
@@ -146,6 +155,18 @@ table {
   margin-top: 20px;
 }
 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th, .table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
 th {
   background-color: #f2f2f2;  
   color: #333;
@@ -168,6 +189,9 @@ tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
+.alert {
+  margin-bottom: 1rem; /* Add spacing below the alert */
+}
 
 .error-container {
   font-family: 'Papyrus', Arial, sans-serif;
