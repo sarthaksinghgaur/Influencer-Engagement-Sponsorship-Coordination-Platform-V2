@@ -3,7 +3,6 @@
     <div class="text-center">
       <h1 class="display-4">Influencer Engagement & Sponsorship Coordination Platform - V2</h1>
       <h2 class="text-muted">IITM MAD2 PROJECT</h2>
-      <p class="lead">Muhuhahahaha</p>
     </div>
 
     <!-- Flash messages section -->
@@ -23,6 +22,12 @@
         <button class="btn btn-success mx-2">Sign Up</button>
       </router-link>
     </div>
+    <div class="text-center">
+    <p></p>
+    <p></p>
+    <p></p>
+    <p class="lead">21f3001936 : Sarthak Singh Gaur</p>
+  </div>
   </div>
 </template>
 

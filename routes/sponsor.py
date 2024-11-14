@@ -1,13 +1,15 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource
 from flask_security import auth_token_required, roles_accepted
-from models import *
+from models import db, Campaign, Sponsor, AdRequest, Influencer
 from flask_login import current_user
 from datetime import datetime
+from cacher import cache
 
 class SponsorDashboard(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
+    @cache.cached(timeout=120)
     def get(self):
         user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
@@ -85,6 +87,7 @@ class CreateCampaign(Resource):
 class UpdateCampaign(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
+    @cache.cached(timeout=120)
     def get(self, campaign_id):
         campaign = Campaign.query.get_or_404(campaign_id)
 
@@ -158,6 +161,7 @@ class DeleteCampaign(Resource):
 class CreateAdRequest(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
+    @cache.cached(timeout=120)
     def get(self):
         user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
@@ -266,6 +270,7 @@ class DeleteAdRequest(Resource):
 class FindInfluencers(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
+    @cache.cached(timeout=180)
     def post(self):
         data = request.get_json()
 
@@ -306,6 +311,7 @@ class FindInfluencers(Resource):
 class ActionInfluencer(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
+    @cache.cached(timeout=120)
     def get(self, influencer_id):
         influencer = Influencer.query.get_or_404(influencer_id)
         user = current_user

@@ -40,6 +40,11 @@ export default {
   },
   created() {
     this.logout_fn();
+    const messageFromQuery = this.$route.query.message;
+    if (messageFromQuery) {
+      this.messages.push(messageFromQuery);
+    }
+    
   },
   methods: {
     logout_fn() {

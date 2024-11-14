@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Report</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <!-- Header Section -->
+        <h1 style="color: #ff6f61; text-align: center; margin: 0;">Admin Dashboard Report</h1>
+        <h2 style="color: #ff6f61; text-align: center; font-size: 20px;">Welcome, Admin</h2>
+
+        <!-- Statistics Section -->
+        <div style="margin-top: 20px;">
+            <h2 style="color: #ff6f61; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Statistics</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Active Users:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ active_users }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Campaigns:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ total_campaigns }}</td>
+                </tr>
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Public Campaigns:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ public_campaigns }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Private Campaigns:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ private_campaigns }}</td>
+                </tr>
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Ad Requests:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ ad_requests }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Accepted Ad Requests:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ accepted_ad_requests }}</td>
+                </tr>
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Flagged Sponsors:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ flagged_sponsors }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Flagged Influencers:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ flagged_influencers }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Pending Sponsors Section -->
+        <div style="margin-top: 30px;">
+            <h2 style="color: #ff6f61; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Pending Sponsors for Approval</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Company Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Industry</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Budget</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sponsor in sponsors %}
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ sponsor.company_name }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ sponsor.industry }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ sponsor.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Section -->
+        <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #777; font-size: 14px;">This is an automatically generated email. Please do not reply.</p>
+            <p style="color: #777; font-size: 14px;">Modern Application Development 2 Project.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Sponsor Report</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        
+        <!-- Header Section -->
+        <h1 style="color: #ff6f61; text-align: center; margin: 0;">Monthly Sponsor Report</h1>
+        <h2 style="color: #ff6f61; text-align: center; font-size: 20px;">Company: {{ company_name }}</h2>
+
+        <!-- Statistics Section -->
+        <div style="margin-top: 20px;">
+            <h2 style="color: #ff6f61; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Statistics</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Campaigns:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ total_campaigns }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Ad Requests:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ ad_requests }}</td>
+                </tr>
+                <tr style="background-color: #f2f2f2;">
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Budget Used:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ budget_used }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Budget Remaining:</strong></td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ budget_remaining }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Campaign Details Section -->
+        <div style="margin-top: 30px;">
+            <h2 style="color: #ff6f61; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Campaign Details</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #ff6f61; color: white;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Campaign Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Description</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Start Date</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">End Date</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Budget</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ campaign.name }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ campaign.description }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ campaign.start_date }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ campaign.end_date }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ campaign.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ad Request Details Section -->
+        <div style="margin-top: 30px;">
+            <h2 style="color: #ff6f61; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Ad Requests Details</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #ff6f61; color: white;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Ad Request Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Status</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Payment Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ad_request in ad_requests_list %}
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ ad_request.name }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ ad_request.status }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ ad_request.payment_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Section -->
+        <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #777; font-size: 14px;">This is an automatically generated email. Please do not reply.</p>
+            <p style="color: #777; font-size: 14px;">Modern Application Development 2 Project.</p>
+        </div>
+    </div>
+</body>
+
+</html>

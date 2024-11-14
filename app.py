@@ -1,49 +1,53 @@
-from flask import request
+from flask import Flask
+from models import db, user_datastore
+from flask_security import Security
+from flask_restful import Api
+from flask_cors import CORS
+from cacher import cache
 from celery.schedules import crontab
-from celery_task import monthly_reminder, daily_reminder
+from celery_task import monthly_reminder_admin, monthly_reminder_sponsors, daily_reminder_influencer
 from extensions import mail
+from celery_worker import celery_init_app
+from cacher import cache
 
 def create_app():
-    from flask import Flask
     app = Flask(__name__)
 
     app.config.from_object("config.localDev")
     app.config.from_object("mailer_config.Config")
 
-    from models import db, user_datastore
     db.init_app(app)
     mail.init_app(app)
     
-    from flask_security import Security
     security = Security(app, user_datastore)
 
-    from flask_restful import Api
     api = Api(app)
 
-    from flask_cors import CORS
     CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:8080"}})
 
-    from cacher import cache
     cache.init_app(app)
 
     return app, api
 
 app, api_handler = create_app()
 
-from celery_worker import celery_init_app
 celery_app = celery_init_app(app)
 
 @celery_app.on_after_configure.connect
 def celery_job(sender, **kwargs):
-    # sender.add_periodic_task(crontab(hour=10, minute=0, day_of_month=1), monthly_reminder.s())
-    # sender.add_periodic_task(crontab(hour=16, minute=0), daily_reminder.s())
+    # sender.add_periodic_task( crontab(hour=10, minute=0, day_of_month=1), monthly_reminder_admin.s(), name='monthly_admin_report')
+    # sender.add_periodic_task( crontab(hour=10, minute=30, day_of_month=1), monthly_reminder_sponsors.s(), name='monthly_sponsor_report')
+    # sender.add_periodic_task(crontab(hour=16, minute=0), daily_reminder_influencer.s(), name='daily_reminder_task')
 
-    sender.add_periodic_task(50, monthly_reminder.s())
-    sender.add_periodic_task(50, daily_reminder.s())
+    sender.add_periodic_task(50, monthly_reminder_admin.s())
+    sender.add_periodic_task(50, monthly_reminder_sponsors.s())
+    sender.add_periodic_task(50, daily_reminder_influencer.s())
 
-
-from routes.hello_worldo import hello_worldo  
-api_handler.add_resource(hello_worldo, "/hello_worldo")
+# for demonstration purposes only
+@app.route('/clear-cache', methods=['GET'])
+def clear_cache():
+    cache.clear()
+    return "Cache Cleared!" 
 
 from routes.auth import Login, Signup, Logout, SponsorRegistration, InfluencerRegistration
 api_handler.add_resource(Login, "/api/login")
@@ -87,6 +91,9 @@ api_handler.add_resource(ActionAdRequest, "/api/influencer/ActionAdRequest/<int:
 api_handler.add_resource(FindCampaigns, "/api/influencer/FindCampaigns")
 api_handler.add_resource(FindAdRequests, "/api/influencer/FindAdRequests/<int:campaign_id>")
 api_handler.add_resource(UpdateInfluencerProfile, "/api/influencer/UpdateInfluencerProfile")
+
+from routes.export import export_bp
+app.register_blueprint(export_bp, url_prefix='/api/export')
 
 if __name__ == "__main__":
     app.run(port=8008, debug=True)

@@ -108,8 +108,8 @@ export default {
           console.log('Response status:', response.status);
           
           if (response.status === 201) {
-            console.log('Sponsor registration successful');
-            this.$router.push({ name: 'SponsorDashboard' });
+            console.log("Sponsor registration successful but needs Admin's aproval. Logging out...");
+            this.$router.push({ name: 'LogoutPage', query: { message: "Sponsor registration successful but needs Admin's approval." }});
           } else {
             this.messages.push('Sponsor registration failed. Please try again.');
           }

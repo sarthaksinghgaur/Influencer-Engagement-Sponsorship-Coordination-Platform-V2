@@ -1,12 +1,15 @@
 from flask import jsonify, session, request, make_response
 from flask_restful import Resource
 from flask_security import auth_token_required, roles_accepted
-from models import *
+from models import Influencer, AdRequest, Campaign, db
+from datetime import datetime
 from flask_login import current_user
+from cacher import cache
 
 class InfluencerDashboard(Resource):
     @auth_token_required
     @roles_accepted('influencer')
+    @cache.cached(timeout=120)
     def get(self):
         user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
@@ -44,6 +47,7 @@ class InfluencerDashboard(Resource):
 class ActionAdRequest(Resource):
     @auth_token_required
     @roles_accepted('influencer')
+    @cache.cached(timeout=120)
     def get(self, id):
         ad_request = AdRequest.query.get_or_404(id)
         ad_request_data = {
@@ -76,7 +80,7 @@ class ActionAdRequest(Resource):
             new_payment_amount = data.get('new_payment_amount')
             if new_payment_amount:
                 ad_request.payment_amount = new_payment_amount
-                ad_request.status = 'Negotiations Underway from influencer'
+                ad_request.status = 'Negotiations Underway from Influencer'
                 ad_request.influencer_id = influencer.id
 
         db.session.commit()
@@ -86,6 +90,7 @@ class ActionAdRequest(Resource):
 class FindCampaigns(Resource):
     @auth_token_required
     @roles_accepted('influencer')
+    @cache.cached(timeout=120)
     def get(self):
         return jsonify({'message': 'Render the campaign search form here.'})
 
@@ -129,6 +134,7 @@ class FindCampaigns(Resource):
 class FindAdRequests(Resource):
     @auth_token_required
     @roles_accepted('influencer')
+    @cache.cached(timeout=120)
     def get(self, campaign_id):
         campaign = Campaign.query.get_or_404(campaign_id)
         ad_requests = AdRequest.query.filter_by(campaign_id=campaign_id, status='Available', flagged=False).all()
@@ -155,6 +161,7 @@ class FindAdRequests(Resource):
 class UpdateInfluencerProfile(Resource):
     @auth_token_required
     @roles_accepted('influencer')
+    @cache.cached(timeout=60)
     def get(self):
         user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()

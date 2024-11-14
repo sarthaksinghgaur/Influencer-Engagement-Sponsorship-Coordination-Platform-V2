@@ -1,11 +1,13 @@
-from flask import jsonify, request, session, redirect, make_response
+from flask import jsonify, request, session, make_response
 from flask_restful import Resource
 from flask_security import auth_token_required, roles_accepted, roles_required
-from models import *
+from models import User, Campaign, AdRequest, Sponsor, Influencer, db
+from cacher import cache
 
 class AdminDashboard(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         active_users = User.query.filter_by(active=True).count()
         total_campaigns = Campaign.query.count()
@@ -14,16 +16,13 @@ class AdminDashboard(Resource):
         ad_requests = AdRequest.query.count()
         flagged_sponsors = Sponsor.query.filter_by(flagged=True).count()
         flagged_influencers = Influencer.query.filter_by(flagged=True).count()
+        flagged_campaigns = Campaign.query.filter_by(flagged=True).count()
+        flagged_ad_requests = AdRequest.query.filter_by(flagged=True).count()
 
         pending_ad_requests = AdRequest.query.filter(
-            AdRequest.status.in_(['Negotiations Underway from Sponsor', 'Negotiations Underway from influencer'])
+            AdRequest.status.in_(['Negotiations Underway from Sponsor', 'Negotiations Underway from Influencer', 'Influencer Requested for Ad'])
         ).count()
         accepted_ad_requests = AdRequest.query.filter_by(status='Accepted').count()
-        rejected_ad_requests = AdRequest.query.filter_by(status='Rejected').count()
-
-        sponsors = Sponsor.query.all()
-        influencers = Influencer.query.all()
-        campaigns = Campaign.query.all()
 
         stats = {
             'active_users': active_users,
@@ -33,17 +32,13 @@ class AdminDashboard(Resource):
             'ad_requests': ad_requests,
             'flagged_sponsors': flagged_sponsors,
             'flagged_influencers': flagged_influencers,
+            'flagged_campaigns': flagged_campaigns,
+            'flagged_ad_requests': flagged_ad_requests,
             'pending_ad_requests': pending_ad_requests,
-            'accepted_ad_requests': accepted_ad_requests,
-            'rejected_ad_requests': rejected_ad_requests
+            'accepted_ad_requests': accepted_ad_requests
         }
 
-        return jsonify({
-            'stats': stats,
-            'campaigns': [{'id': campaign.id, 'name': campaign.name} for campaign in campaigns],
-            'sponsors': [{'id': sponsor.id, 'name': sponsor.company_name} for sponsor in sponsors],
-            'influencers': [{'id': influencer.id, 'name': influencer.name} for influencer in influencers]
-        })
+        return jsonify({'stats': stats })
 
 class PendingSponsors(Resource):
     @auth_token_required
@@ -77,6 +72,7 @@ class ApproveSponsor(Resource):
 class AdminViewUsers(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         users = User.query.all()
         users_data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
@@ -107,6 +103,7 @@ class ToggleUserActive(Resource):
 class AdminViewCampaigns(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         campaigns = Campaign.query.all()
         campaigns_data = [
@@ -129,6 +126,7 @@ class AdminViewCampaigns(Resource):
 class AdminViewAdRequests(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         ad_requests = AdRequest.query.all()
         ad_requests_data = [
@@ -149,6 +147,7 @@ class AdminViewAdRequests(Resource):
 class AdminViewSponsors(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         sponsors = Sponsor.query.all()
         sponsors_data = [
@@ -167,6 +166,7 @@ class AdminViewSponsors(Resource):
 class AdminViewInfluencers(Resource):
     @auth_token_required
     @roles_accepted('admin')
+    @cache.cached(timeout=120)
     def get(self):
         influencers = Influencer.query.all()
         influencers_data = [
@@ -242,6 +242,4 @@ class FlagAdRequest(Resource):
 
         status = "flagged" if ad_request.flagged else "unflagged"
         return jsonify({"message": f"Ad request has been {status}.", "ad_request_id": ad_request.id, "flagged": ad_request.flagged})
-
-
     
