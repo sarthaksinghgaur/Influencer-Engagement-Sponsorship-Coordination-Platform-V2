@@ -9,7 +9,7 @@ from cacher import cache
 class InfluencerDashboard(Resource):
     @auth_token_required
     @roles_accepted('influencer')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
@@ -47,7 +47,7 @@ class InfluencerDashboard(Resource):
 class ActionAdRequest(Resource):
     @auth_token_required
     @roles_accepted('influencer')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self, id):
         ad_request = AdRequest.query.get_or_404(id)
         ad_request_data = {
@@ -84,13 +84,14 @@ class ActionAdRequest(Resource):
                 ad_request.influencer_id = influencer.id
 
         db.session.commit()
+        cache.clear()
 
         return jsonify({'message': 'Action taken successfully!'})
 
 class FindCampaigns(Resource):
     @auth_token_required
     @roles_accepted('influencer')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         return jsonify({'message': 'Render the campaign search form here.'})
 
@@ -128,13 +129,14 @@ class FindCampaigns(Resource):
                 'goals': campaign.goals
             } for campaign in campaigns
         ]
+        cache.clear()
 
         return jsonify(campaign_data)
 
 class FindAdRequests(Resource):
     @auth_token_required
     @roles_accepted('influencer')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self, campaign_id):
         campaign = Campaign.query.get_or_404(campaign_id)
         ad_requests = AdRequest.query.filter_by(campaign_id=campaign_id, status='Available', flagged=False).all()
@@ -161,7 +163,7 @@ class FindAdRequests(Resource):
 class UpdateInfluencerProfile(Resource):
     @auth_token_required
     @roles_accepted('influencer')
-    @cache.cached(timeout=60)
+    @cache.cached(timeout=10)
     def get(self):
         user = current_user
         influencer = Influencer.query.filter_by(user_id=user.id).first()
@@ -188,6 +190,7 @@ class UpdateInfluencerProfile(Resource):
         influencer.platform = data['platform']
 
         db.session.commit()
+        cache.clear()
         return jsonify({'message': 'Profile updated successfully!'})
 
 

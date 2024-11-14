@@ -17,7 +17,6 @@ def monthly_reminder_admin():
     with open('report_admin.html', 'r') as file:
         template = Template(file.read())
 
-    # Gather data for the report
     active_users = User.query.filter_by(active=True).count()
     total_campaigns = Campaign.query.count()
     public_campaigns = Campaign.query.filter_by(visibility='public').count()
@@ -102,7 +101,6 @@ def monthly_reminder_sponsors():
             ad_requests_list=stats['ad_requests_list']
         )
 
-        # Send the email to each sponsor
         send_email(
             sponsor.user.email,
             "Monthly Campaign Report",
@@ -118,16 +116,13 @@ from httplib2 import Http
 @shared_task(ignore_result=False)
 def daily_reminder_influencer():
     try:
-        # Get influencers who haven't logged in within the past 24 hours
         timestamp = datetime.utcnow() - timedelta(hours=24)
 
-        # Get users with associated influencer accounts who haven't logged in in the last 24 hours
         not_visited_influencers = User.query.filter(
-            User.influencer != None,  # Ensure that the user has an associated Influencer record
+            User.influencer != None,
             User.last_login_at < timestamp
         ).all()
 
-        # Get influencers with pending ad requests
         pending_ad_requests = AdRequest.query.filter(
             AdRequest.status.in_([
                 'Negotiations Underway from Sponsor',
@@ -137,23 +132,20 @@ def daily_reminder_influencer():
             ])
         ).all()
 
-        # Get a set of influencer user IDs with pending ad requests
         pending_influencer_ids = {ad.influencer.user_id for ad in pending_ad_requests if ad.influencer_id}
 
-        # Get users who have pending ad requests
         influencers_with_pending_requests = User.query.filter(
             User.influencer != None,
             User.id.in_(pending_influencer_ids)
         ).all()
 
-        # Combine both sets of influencers without duplication
         all_influencers_to_notify = set(not_visited_influencers + influencers_with_pending_requests)
 
         if not all_influencers_to_notify:
             return "No influencers to notify today"
 
         for user in all_influencers_to_notify:
-            if user.username != 'admin':  # Ensure admin is not notified
+            if user.username != 'admin':
                 send_notification(user.username)
                 send_email_notification(user.email)
 

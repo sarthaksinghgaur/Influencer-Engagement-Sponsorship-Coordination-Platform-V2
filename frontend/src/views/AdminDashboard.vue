@@ -128,7 +128,7 @@ export default {
             this.messages = response.data.flashMessages || [];
 
             localStorage.setItem('adminDashboardStats', JSON.stringify(this.stats));
-            localStorage.setItem('adminDashboardStatsExpiry', new Date(Date.now() + 1 * 60 * 1000));
+            localStorage.setItem('adminDashboardStatsExpiry', new Date(Date.now() + 1 * 10 * 1000));
           })
           .catch((error) => {
             console.error('Error fetching admin dashboard data:', error.response ? error.response.data : error.message);

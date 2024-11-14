@@ -1,0 +1,170 @@
+# i have made this project using conda environment, so i have two version of requirements.txt files, both are added here.
+
+# pip version of requirements.txt
+amqp==5.3.0
+aniso8601 @ file:///tmp/build/80754af9/aniso8601_1614708839015/work
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+async-timeout==5.0.1
+axios==0.4.0
+billiard==4.2.1
+blinker @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_d64vvpf_j3/croot/blinker_1696539070114/work
+cachelib==0.9.0
+cacher==0.1
+celery==5.4.0
+certifi==2024.8.30
+cffi==1.17.1
+charset-normalizer==3.4.0
+click @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_61srkg7e2e/croot/click_1698129815327/work
+click-didyoumean==0.3.1
+click-plugins==1.1.1
+click-repl==0.3.0
+Deprecated==1.2.14
+dnspython==2.7.0
+email_validator==2.2.0
+Flask @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b6zka5i2cn/croot/flask_1716545886197/work
+Flask-Caching==2.3.0
+Flask-Cors @ file:///tmp/build/80754af9/flask_cors_1614875208036/work
+Flask-Excel==0.0.7
+Flask-Login==0.6.3
+Flask-Mail==0.10.0
+Flask-Principal==0.4.0
+Flask-RESTful @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_7c4ee1gpj0/croot/flask-restful_1669055928729/work
+Flask-Security==5.5.2
+Flask-SQLAlchemy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_214y9q2o4g/croot/flask-sqlalchemy_1712567274846/work
+Flask-WTF==1.2.1
+greenlet @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_516imz09pb/croot/greenlet_1702059966336/work
+httplib2==0.22.0
+idna==3.10
+importlib_resources==6.4.5
+itsdangerous @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_00jdi1gu23/croot/itsdangerous_1716533346702/work
+Jinja2 @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_44yzu12j7f/croot/jinja2_1716993410427/work
+kombu==5.4.2
+limits==3.13.0
+lml==0.1.0
+lxml==5.3.0
+markdown-it-py==3.0.0
+MarkupSafe @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_a84ni4pci8/croot/markupsafe_1704206002077/work
+mdurl==0.1.2
+ordered-set==4.1.0
+packaging==24.2
+passlib==1.7.4
+prompt_toolkit==3.0.48
+pycparser==2.22
+pyexcel==0.7.1
+pyexcel-io==0.6.7
+pyexcel-webio==0.1.4
+Pygments==2.18.0
+pyparsing==3.2.0
+python-dateutil @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_66ud1l42_h/croot/python-dateutil_1716495741162/work
+python-dotenv==1.0.1
+pytz @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a4b76c83ik/croot/pytz_1713974318928/work
+redis==5.2.0
+requests==2.32.3
+rich==13.9.4
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+SQLAlchemy @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_3frqduvs8h/croot/sqlalchemy_1725885054432/work
+texttable==1.7.0
+typing_extensions @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_93dg13ilv4/croot/typing_extensions_1715268840722/work
+tzdata==2024.2
+urllib3==2.2.3
+vine==5.1.0
+wcwidth==0.2.13
+Werkzeug @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_5bnbxlhunm/croot/werkzeug_1716533322814/work
+wrapt==1.16.0
+WTForms==3.1.2
+
+# conda version of requirements.txt
+
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: osx-arm64
+# created-by: conda 24.9.2
+# amqp=5.3.0=pypi_0
+# aniso8601=9.0.1=pyhd3eb1b0_0
+# argon2-cffi=23.1.0=pypi_0
+# argon2-cffi-bindings=21.2.0=pypi_0
+# async-timeout=5.0.1=pypi_0
+# axios=0.4.0=pypi_0
+# billiard=4.2.1=pypi_0
+# blinker=1.6.2=py310hca03da5_0
+# bzip2=1.0.8=h80987f9_6
+# ca-certificates=2024.9.24=hca03da5_0
+# cachelib=0.9.0=pypi_0
+# cacher=0.1=pypi_0
+# celery=5.4.0=pypi_0
+# certifi=2024.8.30=pypi_0
+# cffi=1.17.1=pypi_0
+# charset-normalizer=3.4.0=pypi_0
+# click=8.1.7=py310hca03da5_0
+# click-didyoumean=0.3.1=pypi_0
+# click-plugins=1.1.1=pypi_0
+# click-repl=0.3.0=pypi_0
+# deprecated=1.2.14=pypi_0
+# dnspython=2.7.0=pypi_0
+# email-validator=2.2.0=pypi_0
+# flask=3.0.3=py310hca03da5_0
+# flask-caching=2.3.0=pypi_0
+# flask-excel=0.0.7=pypi_0
+# flask-login=0.6.3=pypi_0
+# flask-mail=0.10.0=pypi_0
+# flask-principal=0.4.0=pypi_0
+# flask-restful=0.3.9=py310hca03da5_0
+# flask-security=5.5.2=pypi_0
+# flask-sqlalchemy=3.1.1=py310hca03da5_0
+# flask-wtf=1.2.1=pypi_0
+# flask_cors=3.0.10=pyhd3eb1b0_0
+# greenlet=3.0.1=py310h313beb8_0
+# httplib2=0.22.0=pypi_0
+# idna=3.10=pypi_0
+# importlib-resources=6.4.5=pypi_0
+# itsdangerous=2.2.0=py310hca03da5_0
+# jinja2=3.1.4=py310hca03da5_0
+# kombu=5.4.2=pypi_0
+# libcxx=14.0.6=h848a8c0_0
+# libffi=3.4.4=hca03da5_1
+# limits=3.13.0=pypi_0
+# lml=0.1.0=pypi_0
+# lxml=5.3.0=pypi_0
+# markdown-it-py=3.0.0=pypi_0
+# markupsafe=2.1.3=py310h80987f9_0
+# mdurl=0.1.2=pypi_0
+# ncurses=6.4=h313beb8_0
+# openssl=3.0.15=h80987f9_0
+# ordered-set=4.1.0=pypi_0
+# packaging=24.2=pypi_0
+# passlib=1.7.4=pypi_0
+# pip=24.2=py310hca03da5_0
+# prompt-toolkit=3.0.48=pypi_0
+# pycparser=2.22=pypi_0
+# pyexcel=0.7.1=pypi_0
+# pyexcel-io=0.6.7=pypi_0
+# pyexcel-webio=0.1.4=pypi_0
+# pygments=2.18.0=pypi_0
+# pyparsing=3.2.0=pypi_0
+# python=3.10.11=hb885b13_3
+# python-dateutil=2.9.0post0=py310hca03da5_2
+# python-dotenv=1.0.1=pypi_0
+# pytz=2024.1=py310hca03da5_0
+# readline=8.2=h1a28f6b_0
+# redis=5.2.0=pypi_0
+# requests=2.32.3=pypi_0
+# rich=13.9.4=pypi_0
+# setuptools=75.1.0=py310hca03da5_0
+# six=1.16.0=pyhd3eb1b0_1
+# sqlalchemy=2.0.34=py310hbe2cdee_0
+# sqlite=3.45.3=h80987f9_0
+# texttable=1.7.0=pypi_0
+# tk=8.6.14=h6ba3021_0
+# typing-extensions=4.11.0=py310hca03da5_0
+# typing_extensions=4.11.0=py310hca03da5_0
+# tzdata=2024.2=pypi_0
+# urllib3=2.2.3=pypi_0
+# vine=5.1.0=pypi_0
+# wcwidth=0.2.13=pypi_0
+# werkzeug=3.0.3=py310hca03da5_0
+# wheel=0.44.0=py310hca03da5_0
+# wrapt=1.16.0=pypi_0
+# wtforms=3.1.2=pypi_0
+# xz=5.4.6=h80987f9_1
+# zlib=1.2.13=h18a0788_1

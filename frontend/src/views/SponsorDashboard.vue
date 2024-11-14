@@ -139,7 +139,7 @@ export default {
               adRequests: this.adRequests,
             };
             localStorage.setItem('sponsorDashboardData', JSON.stringify(sponsorData));
-            localStorage.setItem('sponsorDashboardDataExpiry', new Date(Date.now() + 1 * 60 * 1000));
+            localStorage.setItem('sponsorDashboardDataExpiry', new Date(Date.now() + 1 * 10 * 1000));
           })
           .catch((error) => {
             console.error('Error fetching sponsor data:', error.response ? error.response.data : error.message);

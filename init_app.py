@@ -1,5 +1,5 @@
 from app import create_app
-from models import db, user_datastore, User, Role, Influencer, Sponsor, Campaign, AdRequest
+from models import db, user_datastore, Role, Influencer, Sponsor, Campaign, AdRequest
 from flask_security.utils import hash_password
 from datetime import datetime, timedelta
 
@@ -18,19 +18,19 @@ def create_roles():
 def create_users(admin_role, sponsor_role, influencer_role):
 
     admin_user = user_datastore.create_user(
-        email="admin@example.com", username="admin", password=hash_password("adminpassword"), active=True
+        email="fractallitvar+admin@gmail.com", username="admin", password=hash_password("adminpassword"), active=True
     )
     user_datastore.add_role_to_user(admin_user, admin_role)
 
 
     sponsor_user = user_datastore.create_user(
-        email="sponsor@example.com", username="sponsor", password=hash_password("sponsorpassword"), active=True
+        email="fractallitvar+sponsor@gmail.com", username="sponsor", password=hash_password("sponsorpassword"), active=True
     )
     user_datastore.add_role_to_user(sponsor_user, sponsor_role)
 
 
     influencer_user = user_datastore.create_user(
-        email="influencer@example.com", username="influencer", password=hash_password("influencerpassword"), active=True
+        email="fractallitvar+influencer@gmail.com", username="influencer", password=hash_password("influencerpassword"), active=True
     )
     user_datastore.add_role_to_user(influencer_user, influencer_role)
 
@@ -104,7 +104,7 @@ def populate_database():
     influencer_profile = create_influencer(influencer_user)
     campaign = create_campaign(sponsor_profile)
     create_ad_request(campaign, sponsor_profile, influencer_profile)
-    print("Sample data added to the database.")
+    print("Admin added to the database")
 
 
 with app.app_context():  

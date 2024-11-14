@@ -52,8 +52,6 @@ class User(db.Model, UserMixin):
             'fs_uniquifier': self.fs_uniquifier,
             'confirmed_at': self.confirmed_at
         }
-    def get_all_users():
-        return User.query.all()
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -86,50 +84,6 @@ class Influencer(db.Model):
             'flagged': self.flagged,
             'user_id': self.user_id
         }
-
-    def get_all_influencers():
-        return Influencer.query.all()
-    
-    def get_influencer_by_id(influencer_id):
-        return Influencer.query.get(influencer_id)
-
-    def get_influencer_by_name(influencer_name):
-        return Influencer.query.filter_by(name=influencer_name).first()
-    
-    def get_influencer_by_user_id(user_id):
-        return Influencer.query.filter_by(user_id=user_id).first()
-    
-    def get_flagged_influencers():
-        return Influencer.query.filter_by(flagged=True).all()
-    
-    def get_unflagged_influencers():
-        return Influencer.query.filter_by(flagged=False).all()
-    
-    def edit_influencer(influencer_id, name, category, niche, reach, platform):
-        Influencer.query.filter_by(id=influencer_id).update({
-            'name': name,
-            'category': category,
-            'niche': niche,
-            'reach': reach,
-            'platform': platform
-        })
-        db.session.commit()
-
-    def delete_influencer(influencer_id):
-        Influencer.query.filter_by(id=influencer_id).delete()
-        db.session.commit()
-
-    def flag_influencer(influencer_id):
-        Influencer.query.filter_by(id=influencer_id).update({
-            'flagged': True
-        })
-        db.session.commit()
-
-    def unflag_influencer(influencer_id):
-        Influencer.query.filter_by(id=influencer_id).update({
-            'flagged': False
-        })
-        db.session.commit()
     
 
 class Sponsor(db.Model):
@@ -160,42 +114,6 @@ class Sponsor(db.Model):
             'user_id': self.user_id
         }
 
-    def get_all_sponsors():
-        return Sponsor.query.all()
-
-    def get_sponsor_by_id(sponsor_id):
-        return Sponsor.query.get(sponsor_id)
-    
-    def get_flagged_sponsors():
-        return Sponsor.query.filter_by(flagged=True).all()
-    
-    def get_unflagged_sponsors():
-        return Sponsor.query.filter_by(flagged=False).all()
-    
-    def edit_sponsor(sponsor_id, company_name, industry, budget):
-        Sponsor.query.filter_by(id=sponsor_id).update({
-            'company_name': company_name,
-            'industry': industry,
-            'budget': budget
-        })
-        db.session.commit()
-
-    def delete_sponsor(sponsor_id):
-        Sponsor.query.filter_by(id=sponsor_id).delete()
-        db.session.commit()
-
-    def flag_sponsor(sponsor_id):
-        Sponsor.query.filter_by(id=sponsor_id).update({
-            'flagged': True
-        })
-        db.session.commit()
-
-    def unflag_sponsor(sponsor_id):
-        Sponsor.query.filter_by(id=sponsor_id).update({
-            'flagged': False
-        })
-        db.session.commit()
-
 
 class Campaign(db.Model):
     __tablename__ = 'campaign'
@@ -205,7 +123,7 @@ class Campaign(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     budget = db.Column(db.Integer, nullable=False)
-    visibility = db.Column(db.String(10), nullable=False)  # 'public' or 'private'
+    visibility = db.Column(db.String(10), nullable=False)
     flagged = db.Column(db.Boolean, default=False)
     goals = db.Column(db.Text, nullable=False)
     
@@ -229,46 +147,6 @@ class Campaign(db.Model):
             'goals': self.goals,
             'sponsor_id': self.sponsor_id
         }
-
-    def get_all_campaigns():
-        return Campaign.query.all()
-
-    def get_campaign_by_id(campaign_id):
-        return Campaign.query.get(campaign_id)
-
-    def get_flagged_campaigns():
-        return Campaign.query.filter_by(flagged=True).all()
-    
-    def get_unflagged_campaigns():
-        return Campaign.query.filter_by(flagged=False).all()
-    
-    def edit_campaign(campaign_id, name, description, start_date, end_date, budget, visibility, goals):
-        Campaign.query.filter_by(id=campaign_id).update({
-            'name': name,
-            'description': description,
-            'start_date': start_date,
-            'end_date': end_date,
-            'budget': budget,
-            'visibility': visibility,
-            'goals': goals
-        })
-        db.session.commit()
-
-    def delete_campaign(campaign_id):
-        Campaign.query.filter_by(id=campaign_id).delete()
-        db.session.commit()
-
-    def flag_campaign(campaign_id):
-        Campaign.query.filter_by(id=campaign_id).update({
-            'flagged': True
-        })
-        db.session.commit()
-
-    def unflag_campaign(campaign_id):
-        Campaign.query.filter_by(id=campaign_id).update({
-            'flagged': False
-        })
-        db.session.commit()
 
 
 class AdRequest(db.Model):
@@ -303,23 +181,3 @@ class AdRequest(db.Model):
             'campaign_id': self.campaign_id,
             'influencer_id': self.influencer_id
         }
-
-    def get_all_ad_requests():
-        return AdRequest.query.all()
-
-    def get_ad_request_by_id(ad_request_id):
-        return AdRequest.query.get(ad_request_id)
-    
-    def edit_ad_request(ad_request_id, name, messages, requirements, payment_amount, status):
-        AdRequest.query.filter_by(id=ad_request_id).update({
-            'name': name,
-            'messages': messages,
-            'requirements': requirements,
-            'payment_amount': payment_amount,
-            'status': status
-        })
-        db.session.commit()
-
-    def delete_ad_request(ad_request_id):
-        AdRequest.query.filter_by(id=ad_request_id).delete()
-        db.session.commit()

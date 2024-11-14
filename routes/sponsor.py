@@ -9,7 +9,7 @@ from cacher import cache
 class SponsorDashboard(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
@@ -42,7 +42,6 @@ class SponsorDashboard(Resource):
             'campaigns': campaigns_data,
             'adRequests': ad_requests_data
         })
-    
 
 class CreateCampaign(Resource):
     @auth_token_required
@@ -80,6 +79,7 @@ class CreateCampaign(Resource):
         )
         db.session.add(campaign)
         db.session.commit()
+        cache.clear()
 
         return make_response(jsonify({"message": "Campaign created successfully", "campaign_id": campaign.id}), 201)
 
@@ -87,7 +87,7 @@ class CreateCampaign(Resource):
 class UpdateCampaign(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self, campaign_id):
         campaign = Campaign.query.get_or_404(campaign_id)
 
@@ -132,6 +132,7 @@ class UpdateCampaign(Resource):
         campaign.goals = goals
 
         db.session.commit()
+        cache.clear()
 
         return jsonify({'message': 'Campaign updated successfully!'})
 
@@ -153,6 +154,7 @@ class DeleteCampaign(Resource):
         
         db.session.delete(campaign)
         db.session.commit()
+        cache.clear()
 
         return jsonify({'message': 'Campaign and associated ad requests deleted successfully!'})
 
@@ -161,7 +163,7 @@ class DeleteCampaign(Resource):
 class CreateAdRequest(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         user = current_user
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
@@ -206,7 +208,7 @@ class CreateAdRequest(Resource):
 
         db.session.add(new_ad_request)
         db.session.commit()
-
+        cache.clear()
         return make_response(jsonify({"message": "Ad request created successfully", "ad_request_id": new_ad_request.id}), 201)
     
 class UpdateAdRequest(Resource):
@@ -247,6 +249,7 @@ class UpdateAdRequest(Resource):
         ad_request.status = status
 
         db.session.commit()
+        cache.clear()
 
         return jsonify({'message': 'Ad request updated successfully!'})
     
@@ -263,6 +266,7 @@ class DeleteAdRequest(Resource):
 
         db.session.delete(ad_request)
         db.session.commit()
+        cache.clear()
 
         return jsonify({'message': 'Ad request deleted successfully!'})    
 
@@ -270,7 +274,7 @@ class DeleteAdRequest(Resource):
 class FindInfluencers(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
-    @cache.cached(timeout=180)
+    @cache.cached(timeout=10)
     def post(self):
         data = request.get_json()
 
@@ -305,13 +309,14 @@ class FindInfluencers(Resource):
             }
             for influencer in influencers
         ]
+        cache.clear()
 
         return jsonify(influencer_data)
 
 class ActionInfluencer(Resource):
     @auth_token_required
     @roles_accepted('sponsor')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self, influencer_id):
         influencer = Influencer.query.get_or_404(influencer_id)
         user = current_user
@@ -352,4 +357,5 @@ class ActionInfluencer(Resource):
             ad_request.status = 'Influencer Requested for Ad'
 
         db.session.commit()
+        cache.clear()
         return jsonify({'message': 'Action taken successfully!'})

@@ -136,7 +136,7 @@ export default {
               adRequests: this.adRequests,
             };
             localStorage.setItem('influencerDashboardData', JSON.stringify(influencerData));
-            localStorage.setItem('influencerDashboardDataExpiry', new Date(Date.now() + 1 * 60 * 1000));
+            localStorage.setItem('influencerDashboardDataExpiry', new Date(Date.now() + 1 * 10 * 1000));
           })
           .catch((error) => {
             console.error('Error fetching influencer data:', error.response ? error.response.data : error.message);

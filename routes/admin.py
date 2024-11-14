@@ -7,7 +7,7 @@ from cacher import cache
 class AdminDashboard(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         active_users = User.query.filter_by(active=True).count()
         total_campaigns = Campaign.query.count()
@@ -66,13 +66,14 @@ class ApproveSponsor(Resource):
         
         sponsor.is_approved = True
         db.session.commit()
+        cache.clear()
         
         return make_response(jsonify({"message": "Sponsor has been approved", "username": sponsor.company_name}), 200)
 
 class AdminViewUsers(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         users = User.query.all()
         users_data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
@@ -94,6 +95,7 @@ class ToggleUserActive(Resource):
 
         user.active = active_status
         db.session.commit()
+        cache.clear()
 
         status_text = "activated" if user.active else "deactivated"
         return make_response(jsonify({"message": f"User has been {status_text} successfully.", "user_id": user.id, "active": user.active}), 200)
@@ -103,7 +105,7 @@ class ToggleUserActive(Resource):
 class AdminViewCampaigns(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         campaigns = Campaign.query.all()
         campaigns_data = [
@@ -126,7 +128,7 @@ class AdminViewCampaigns(Resource):
 class AdminViewAdRequests(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         ad_requests = AdRequest.query.all()
         ad_requests_data = [
@@ -147,7 +149,7 @@ class AdminViewAdRequests(Resource):
 class AdminViewSponsors(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         sponsors = Sponsor.query.all()
         sponsors_data = [
@@ -166,7 +168,7 @@ class AdminViewSponsors(Resource):
 class AdminViewInfluencers(Resource):
     @auth_token_required
     @roles_accepted('admin')
-    @cache.cached(timeout=120)
+    @cache.cached(timeout=10)
     def get(self):
         influencers = Influencer.query.all()
         influencers_data = [
@@ -194,6 +196,8 @@ class FlagCampaign(Resource):
         
         campaign.flagged = not campaign.flagged
         db.session.commit()
+        cache.clear()
+
         status = "flagged" if campaign.flagged else "unflagged"
         return jsonify({"message": f"Campaign has been {status}.", "campaign_id": campaign.id, "flagged": campaign.flagged})
     
@@ -208,6 +212,7 @@ class FlagSponsor(Resource):
         
         sponsor.flagged = not sponsor.flagged
         db.session.commit()
+        cache.clear()
         
         status = "flagged" if sponsor.flagged else "unflagged"
         return jsonify({"message": f"Sponsor has been {status}.", "sponsor_id": sponsor.id, "flagged": sponsor.flagged})
@@ -224,6 +229,7 @@ class FlagInfluencer(Resource):
 
         influencer.flagged = not influencer.flagged
         db.session.commit()
+        cache.clear()
         
         status = "flagged" if influencer.flagged else "unflagged"
         return jsonify({"message": f"Influencer has been {status}.", "influencer_id": influencer.id, "flagged": influencer.flagged})
@@ -239,6 +245,7 @@ class FlagAdRequest(Resource):
 
         ad_request.flagged = not ad_request.flagged
         db.session.commit()
+        cache.clear()
 
         status = "flagged" if ad_request.flagged else "unflagged"
         return jsonify({"message": f"Ad request has been {status}.", "ad_request_id": ad_request.id, "flagged": ad_request.flagged})

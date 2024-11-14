@@ -12,7 +12,7 @@ from cacher import cache
 
 def create_app():
     app = Flask(__name__)
-
+    
     app.config.from_object("config.localDev")
     app.config.from_object("mailer_config.Config")
 
