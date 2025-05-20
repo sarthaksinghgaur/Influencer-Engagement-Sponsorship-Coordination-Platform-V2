@@ -1,49 +1,40 @@
-# EcoConnect 🌱
+# Influencer Engagement & Sponsorship Coordination Platform
 
-**EcoConnect** is a sustainability-focused web platform developed during the Hacksprint Hackathon (Jan–Feb 2025) under the theme **"Tech for Social Good."** The project connects users with local recycling centers, verified eco-friendly businesses, and environmental community initiatives, promoting a greener lifestyle through actionable insights and community engagement.
+## 📌 Overview
 
-## 🏆 Achievements
+This web application is a role-based platform designed to streamline interactions between **Influencers**, **Sponsors**, and **Admins**. The platform facilitates campaign creation, sponsorship management, and ad requests through a clean and efficient interface built with **Flask**, **Vue.js**, **Redis**, and **Celery**.
 
-* Placed **7th overall** among all participating teams
-* Recognized for **technical robustness** and **social impact**
+## 🔧 Tech Stack
 
----
+* **Backend**: Flask, Flask-Security, Flask-SQLAlchemy, Flask-Migrate, Redis, Celery
+* **Frontend**: Vue.js, TailwindCSS
+* **Database**: SQLite (development), PostgreSQL (production-ready)
+* **Task Queue**: Celery with Redis broker
+* **Authentication**: Role-based access control using Flask-Security
+* **Version Control**: Git & GitHub
 
-## 🌟 Features
+## 🚀 Features
 
-* 🔐 **User Authentication**: Secure login/signup using Flask-Security with role-based access control (users, businesses, admins)
-* ♻️ **Waste Tracking System**: Users can log, categorize, and filter waste entries by type and date
-* 🏪 **Eco-Business Directory**: Search and discover verified eco-friendly businesses
-* 🧾 **Business Verification Workflow**: Admins can verify businesses, and users can leave reviews
-* ⚡ **Fast REST API**: Modular, well-documented, and scalable Flask-based RESTful API
-* 📃 **Community Initiative Management**: Create and join environmental activities in local communities
-* ✅ **Data Validation & Error Handling**: Marshmallow schemas for structured validation and clean error responses
+### 👤 Role-Based Access
 
----
+* **Admin**: Manages user approvals, roles, and campaigns
+* **Influencer**: Applies for campaigns, receives ad requests, manages profile
+* **Sponsor**: Creates campaigns, sends ad requests, views influencer applications
 
-## ⚙️ Tech Stack
+### 📋 Functional Modules
 
-### Backend
+* **User Authentication**: Registration, login, logout using Flask-Security
+* **Campaign Management**: Sponsors create, update, and view campaigns
+* **Ad Requests**: Sent by sponsors to influencers; influencers can accept or reject
+* **Celery Tasks**: Handles background tasks like sending approval emails
+* **Admin Approval System**: Sponsors need admin approval to access platform features
 
-* **Flask** (Python web framework)
-* **SQLite** (lightweight relational database)
-* **Flask-Security** (user auth & roles)
-* **SQLAlchemy** (ORM)
-* **Postman** (API testing)
 
-### Frontend (Collaborative Integration)
+## 🎯 Achievements
 
-* Vue.js interface (handled by frontend developers)
-* Axios (for API calls)
-* Integrated via RESTful endpoints
-
-### Tools & Practices
-
-* GitHub Projects (Agile task management)
-* Modular codebase & scalable design
-* Deployment-ready documentation & scripts
-
----
+* Successfully implemented a secure and scalable role-based platform
+* Enabled asynchronous email workflows using Celery
+* Followed clean software engineering practices with modular design
 
 ## 🚀 How to Run the Project
 
@@ -81,6 +72,7 @@
 **Sarthak Singh Gaur**
 
 ---
+
 
 ## 📄 License
 
